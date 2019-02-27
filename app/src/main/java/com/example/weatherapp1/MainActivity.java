@@ -2,6 +2,8 @@ package com.example.weatherapp1;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -21,11 +23,10 @@ import com.google.gson.GsonBuilder;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     TextView cityField, detailsField, currentTemperatureField, humidity_field, pressure_field, updatedField;
@@ -37,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<MainWeatherClass> weatherList = new ArrayList<MainWeatherClass>();
     ListAdapter adapter = new ListAdapter(this, weatherList);
     Gson gson = new Gson();
+    DisplayItem display = null;
+    ArrayList<DisplayItem> displayItems;
+    public static SQLiteDatabase db = null;
+    public static DBHelper helper;
+    public static Cursor result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         currentTemperatureField = (TextView) findViewById(R.id.tempField);
         humidity_field = (TextView) findViewById(R.id.humidField);
         pressure_field = (TextView) findViewById(R.id.pressureField);
+
+        display = new DisplayItem();
 
         taskLoadUp(city);
     }
@@ -95,8 +103,38 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("Exception", "onPostExecute: main is null");
                 }
                 Log.d("Network", "onPostExecute: " + main.toString());
-                weatherList.add(main);
 
+                helper = new DBHelper(getApplicationContext());
+                db = helper.getWritableDatabase();
+                result = db.rawQuery("SELECT  * FROM Weather", null);
+                if (result != null && result.getCount() > 0) {
+                    result.moveToFirst();
+                    Log.d("MainActivity", "NotNull");
+                } else {
+                    helper.insert(1, main.getName(), main.getWind().getSpeed(), main.getVisibility(), main.getMain().getTemp(), main.getMain().getHumidity(), main.getMain().getPressure());
+                    Log.d("MainActivity", "Null");
+                }
+
+                String tempID = "";
+                String tempCountry = "";
+                String tempWindSpeed = "";
+                String tempVisibility = "";
+                String tempTemp = "";
+                String tempHumid = "";
+                String tempPressure = "";
+                while(!result.isAfterLast() ) {
+                    tempID = result.getString(result.getColumnIndex("ID"));
+                    tempCountry = result.getString(result.getColumnIndex("Country"));
+                    tempWindSpeed = result.getString(result.getColumnIndex("Wind_speed"));
+                    tempVisibility = result.getString(result.getColumnIndex("Visibility"));
+                    tempTemp = result.getString(result.getColumnIndex("Temperature"));
+                    tempHumid = result.getString(result.getColumnIndex("Humidity"));
+                    tempPressure = result.getString(result.getColumnIndex("Pressure"));
+                    displayItems.add(new DisplayItem(tempID, tempCountry, tempWindSpeed, tempVisibility, tempTemp, tempHumid, tempPressure));
+                    result.moveToNext();
+                }
+
+                weatherList.add(main);
                 lv = findViewById(R.id.weatherLV);
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
