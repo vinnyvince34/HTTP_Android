@@ -2,21 +2,13 @@ package com.example.weatherapp1;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.text.Html;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -26,12 +18,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Locale;
 
 import okhttp3.OkHttpClient;
-import okhttp3.Response;
 import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Networking {
     static OkHttpClient client = new OkHttpClient();
@@ -46,6 +39,22 @@ public class Networking {
             return response.body().string();
         }
     }
+
+    private static Retrofit retrofit = null;
+    private static final String BASEURL = "http://api.openweathermap.org/data/2.5/";
+
+    static listResourcesApi getRetrofitObject() {
+        final String[] xml = {""};
+        final Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        listResourcesApi service = retrofit.create(listResourcesApi.class);
+        Call<MainWeatherClass> call = service.getMainWeatherClass();
+
+        return service;
+    }
+
 
     public static MainWeatherClass ConvertJSON (JSONObject json) {
         int i = 0;
@@ -83,12 +92,9 @@ public class Networking {
             Log.d("Network", "ConvertJSON: " + jsonChild.toString());
             Log.d("Network", "ConvertJSON: " + jsonChild.get("id").toString());
 //            Weather weather = new Weather(jsonChild.get("id").toString(), jsonChild.get("main").toString(), jsonChild.get("description").toString(), jsonChild.get("icon").toString());
-            Weather[] weather = new Weather[1];
-            weather[0] = new Weather();
-            weather[0].setId(jsonChild.get("id").toString());
-            weather[0].setIcon(jsonChild.get("icon").toString());
-            weather[0].setMain(jsonChild.get("main").toString());
-            weather[0].setDescription(jsonChild.get("description").toString());
+            ArrayList<Weather> weather = new ArrayList<>();
+            Weather tempW = new Weather(jsonChild.get("id").toString(), jsonChild.get("icon").toString(), jsonChild.get("main").toString(), jsonChild.get("description").toString());
+            weather.add(tempW);
             i++;
 
             jsonChild = (JSONObject)json.get("main");

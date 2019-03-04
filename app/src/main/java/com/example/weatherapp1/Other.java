@@ -1,6 +1,9 @@
 package com.example.weatherapp1;
 
-public class Other {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Other extends ClassLoader implements Parcelable {
     private String temp;
     private String temp_min;
     private String humidity;
@@ -59,4 +62,39 @@ public class Other {
                 ", temp_max='" + temp_max + '\'' +
                 '}';
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.temp);
+        dest.writeString(this.temp_min);
+        dest.writeString(this.humidity);
+        dest.writeString(this.pressure);
+        dest.writeString(this.temp_max);
+    }
+
+    protected Other(Parcel in) {
+        this.temp = in.readString();
+        this.temp_min = in.readString();
+        this.humidity = in.readString();
+        this.pressure = in.readString();
+        this.temp_max = in.readString();
+    }
+
+    public static final Parcelable.Creator<Other> CREATOR = new Parcelable.Creator<Other>() {
+        @Override
+        public Other createFromParcel(Parcel source) {
+            return new Other(source);
+        }
+
+        @Override
+        public Other[] newArray(int size) {
+            return new Other[size];
+        }
+    };
 }

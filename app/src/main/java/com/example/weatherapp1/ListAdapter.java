@@ -17,11 +17,12 @@ import java.util.ArrayList;
 public class ListAdapter extends BaseAdapter {
     Activity activity;
     ArrayList<MainWeatherClass> weatherList;
-    String url;
+    DBHelper helper;
 
-    public ListAdapter(Activity activity, ArrayList<MainWeatherClass> weatherList) {
+    public ListAdapter(Activity activity, ArrayList<MainWeatherClass> weatherList, DBHelper helper) {
         this.activity = activity;
         this.weatherList = weatherList;
+        this.helper = helper;
     }
 
     @Override
@@ -47,7 +48,7 @@ public class ListAdapter extends BaseAdapter {
 
     @SuppressLint("SetTextI18n")
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;
         LayoutInflater inflater = activity.getLayoutInflater();
         if (convertView == null) {
@@ -65,6 +66,14 @@ public class ListAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+        holder.deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                weatherList.remove(position);
+                helper.delete(position);
+                notifyDataSetChanged();
+            }
+        });
         for(int i = 0; i < weatherList.size(); i++) {
             DateFormat df = DateFormat.getDateTimeInstance();
 

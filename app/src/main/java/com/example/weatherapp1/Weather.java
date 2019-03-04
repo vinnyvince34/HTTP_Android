@@ -1,6 +1,9 @@
 package com.example.weatherapp1;
 
-public class Weather {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Weather implements Parcelable {
     private String icon;
     private String description;
     private String main;
@@ -50,4 +53,37 @@ public class Weather {
                 ", id='" + id + '\'' +
                 '}';
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.icon);
+        dest.writeString(this.description);
+        dest.writeString(this.main);
+        dest.writeString(this.id);
+    }
+
+    protected Weather(Parcel in) {
+        this.icon = in.readString();
+        this.description = in.readString();
+        this.main = in.readString();
+        this.id = in.readString();
+    }
+
+    public static final Parcelable.Creator<Weather> CREATOR = new Parcelable.Creator<Weather>() {
+        @Override
+        public Weather createFromParcel(Parcel source) {
+            return new Weather(source);
+        }
+
+        @Override
+        public Weather[] newArray(int size) {
+            return new Weather[size];
+        }
+    };
 }

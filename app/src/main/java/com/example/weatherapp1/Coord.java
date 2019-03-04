@@ -1,6 +1,9 @@
 package com.example.weatherapp1;
 
-public class Coord {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Coord extends ClassLoader implements Parcelable {
     private String lon;
     private String lat;
 
@@ -32,4 +35,33 @@ public class Coord {
                 ", lat='" + lat + '\'' +
                 '}';
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.lon);
+        dest.writeString(this.lat);
+    }
+
+    protected Coord(Parcel in) {
+        this.lon = in.readString();
+        this.lat = in.readString();
+    }
+
+    public static final Parcelable.Creator<Coord> CREATOR = new Parcelable.Creator<Coord>() {
+        @Override
+        public Coord createFromParcel(Parcel source) {
+            return new Coord(source);
+        }
+
+        @Override
+        public Coord[] newArray(int size) {
+            return new Coord[size];
+        }
+    };
 }

@@ -1,9 +1,15 @@
 package com.example.weatherapp1;
 
-import java.util.Arrays;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class MainWeatherClass {
-    private Weather[] weather;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.jar.Pack200;
+
+public class MainWeatherClass implements Parcelable {
+    private List<Weather> weather;
     private Cloud cloud;
     private Wind wind;
     private Coord coord;
@@ -16,10 +22,11 @@ public class MainWeatherClass {
     private String name;
     private String httpCode;
 
+
     public MainWeatherClass() {
     }
 
-    public MainWeatherClass(Weather weather[], Cloud cloud, Wind wind, Coord coord, System sys, Other main, String base, String visibility, String dt, String id, String name, String httpCode) {
+    public MainWeatherClass(List<Weather> weather, Cloud cloud, Wind wind, Coord coord, System sys, Other main, String base, String visibility, String dt, String id, String name, String httpCode) {
         this.weather = weather;
         this.cloud = cloud;
         this.wind = wind;
@@ -34,7 +41,7 @@ public class MainWeatherClass {
         this.httpCode = httpCode;
     }
 
-    public MainWeatherClass(Weather weather[], Cloud cloud, Wind wind, Coord coord, System sys, Other main) {
+    public MainWeatherClass(List<Weather> weather, Cloud cloud, Wind wind, Coord coord, System sys, Other main) {
         this.weather = weather;
         this.cloud = cloud;
         this.wind = wind;
@@ -49,11 +56,11 @@ public class MainWeatherClass {
         this.httpCode = "";
     }
 
-    public Weather[] getWeather() {
+    public List<Weather> getWeather() {
         return weather;
     }
 
-    public void setWeather(Weather weather[]) {
+    public void setWeather(List<Weather> weather) {
         this.weather = weather;
     }
 
@@ -148,7 +155,7 @@ public class MainWeatherClass {
     @Override
     public String toString() {
         return "MainWeatherClass{" +
-                "weather=" + Arrays.toString(weather) +
+                "weather=" + weather +
                 ", cloud=" + cloud +
                 ", wind=" + wind +
                 ", coord=" + coord +
@@ -162,4 +169,53 @@ public class MainWeatherClass {
                 ", httpCode='" + httpCode + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(this.weather);
+        dest.writeParcelable(this.cloud, flags);
+        dest.writeParcelable(this.wind, flags);
+        dest.writeParcelable(this.coord, flags);
+        dest.writeParcelable(this.sys, flags);
+        dest.writeParcelable(this.main, flags);
+        dest.writeString(this.base);
+        dest.writeString(this.visibility);
+        dest.writeString(this.dt);
+        dest.writeString(this.id);
+        dest.writeString(this.name);
+        dest.writeString(this.httpCode);
+    }
+
+    protected MainWeatherClass(Parcel in) {
+        this.weather = new ArrayList<>();
+        in.readList(this.weather, Weather.class.getClassLoader());
+        this.cloud = in.readParcelable(Cloud.class.getClassLoader());
+        this.wind = in.readParcelable(Wind.class.getClassLoader());
+        this.coord = in.readParcelable(Coord.class.getClassLoader());
+        this.sys = in.readParcelable(System.class.getClassLoader());
+        this.main = in.readParcelable(Other.class.getClassLoader());
+        this.base = in.readString();
+        this.visibility = in.readString();
+        this.dt = in.readString();
+        this.id = in.readString();
+        this.name = in.readString();
+        this.httpCode = in.readString();
+    }
+
+    public static final Creator<MainWeatherClass> CREATOR = new Creator<MainWeatherClass>() {
+        @Override
+        public MainWeatherClass createFromParcel(Parcel source) {
+            return new MainWeatherClass(source);
+        }
+
+        @Override
+        public MainWeatherClass[] newArray(int size) {
+            return new MainWeatherClass[size];
+        }
+    };
 }
