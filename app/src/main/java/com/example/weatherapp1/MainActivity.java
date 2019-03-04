@@ -191,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("MainActivity",weatherList.get(0).getBase()  + "\n");
                     if (resultCode == Activity.RESULT_OK) {
                         weatherList.add(new MainWeatherClass(receiver.getWeather(), receiver.getCloud(), receiver.getWind(), receiver.getCoord(), receiver.getSys(), receiver.getMain(), receiver.getBase(), receiver.getVisibility(), receiver.getDt(), receiver.getId(), receiver.getName(), receiver.getHttpCode()));
+                        helper.insert(weatherList.size() + 1, receiver.getName(), receiver.getWind().getSpeed(), receiver.getVisibility(), receiver.getMain().getTemp(), receiver.getMain().getHumidity(), receiver.getMain().getPressure());
                         adapter.notifyDataSetInvalidated();
                     } else if (resultCode == Activity.RESULT_CANCELED) {
                         return;

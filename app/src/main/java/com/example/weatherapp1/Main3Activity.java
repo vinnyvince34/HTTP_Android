@@ -9,7 +9,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -75,18 +74,6 @@ public class Main3Activity extends AppCompatActivity {
         }
     }
 
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                MainActivity.bIntentEmpty = true;
-                Intent exitIntent = new Intent(this, MainActivity.class);
-                startActivity(exitIntent);
-                finish();
-                Log.d("Network", "onOptionsItemSelected: here");
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
     }
